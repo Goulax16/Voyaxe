@@ -9,11 +9,13 @@
 class Texture
 {
 public:
-	vUINT id;
-	GLenum type;
-	Texture(vCSTR image, GLenum texType, GLenum slot, GLenum format, GLenum pixelType);
+	GLuint ID;
+	vCSTR type;
+	GLuint unit;
 
-	void texUnit(Shader& shader, vCSTR uniform, vUINT unit);
+	Texture(vCSTR image, vCSTR texType, GLuint slot);
+
+	void texUnit(Shader& shader, vCSTR uniform, GLuint unit);
 	void Bind();
 	void Unbind();
 	void Delete();

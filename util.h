@@ -4,17 +4,21 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <vector>
 
 #include <glm/glm.hpp>
 #include <glad/glad.h>
 
 using vSTR = std::string;
 using vCSTR = const char*;
-using vInt = int;
+using vINT = int;
 using vFLOAT = float;
 using vUINT = unsigned int;
-using vBool = bool;
+using vBOOL = bool;
 using vSIZEIPTR = GLsizeiptr;
+
+template<typename T>
+using vVEC = std::vector<T>;
 
 using vVec2 = glm::vec2;
 using vVec3 = glm::vec3;

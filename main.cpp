@@ -1,10 +1,5 @@
-#include "Shader.h"
-#include "EBO.h"
-#include "VAO.h"
-#include "Texture.h"
-#include "Math.h"
-#include "Camera.h"
-#include "MeshRenderer.hpp"
+#include "Model.h"
+#include "Node3D.hpp"
 
 #include <iostream>
 #include <glad/glad.h>
@@ -14,24 +9,18 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-GLfloat vertices[] =
-{ //     COORDINATES     /        COLORS      /   TexCoord  //
-    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
-     0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-     0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
-     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	2.5f, 5.0f
+Vertex vertices[] =
+{
+    Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
+    Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+    Vertex{glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
+    Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)}
 };
 
-// Indices for vertices order
 GLuint indices[] =
 {
     0, 1, 2,
-    0, 2, 3,
-    0, 1, 4,
-    1, 2, 4,
-    2, 3, 4,
-    3, 0, 4
+    0, 2, 3
 };
 
 int main() {
@@ -39,7 +28,7 @@ int main() {
 	//
 	//window->Run();
 
-    auto* node = new MeshRenderer();
+    auto* node = new Node3D();
     node->transform.Translate(0.0f, 1.0f, 0.0f);
 
     glfwInit();
@@ -63,63 +52,39 @@ int main() {
 
     glViewport(0, 0, 800, 600);
 
-    Shader shader = Shader("vert.glsl", "frag.glsl");
+    Shader shader("vert.glsl", "frag.glsl");
 
-    VAO vao;
-    vao.Bind();
+    glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+    glm::mat4 lightModel = glm::mat4(1.0f);
+    lightModel = glm::translate(lightModel, lightPos);
 
-    VBO vbo(vertices, sizeof(vertices));
-    EBO ebo(indices, sizeof(indices));
-
-    vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
-    vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    vao.LinkAttrib(vbo, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-
-    vao.Unbind();
-    vbo.Unbind();
-    ebo.Unbind();
-
-    Texture brickTex("test.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-    brickTex.texUnit(shader, "tex0", 0);
-
-    GLuint quatLoc = glGetUniformLocation(shader.ID, "rotationQuat");
-
-    float angle = 0.0f;
+    shader.Activate();
+    glUniform4f(glGetUniformLocation(shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+    glUniform3f(glGetUniformLocation(shader.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
     glEnable(GL_DEPTH_TEST);
 
     Camera camera(800, 600, glm::vec3(0.0f, 0.0f, 2.0f));
 
+    Model model("models/bunny/scene.gltf");
+
     node->Init();
 
     while (!glfwWindowShouldClose(window)) {
-        angle += 0.01f;
-
         glClearColor(0.0f, 0.24f, 0.32f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shader.Activate();
-
-        Quaternion rotQuat = eulerToQuaternion(angle, 0.0f, 0.0f);  
-        glUniform4f(quatLoc, rotQuat.x, rotQuat.y, rotQuat.z, rotQuat.w);
 
         camera.Inputs(window);
-        camera.Matrix(45.0f, 0.1f, 100.0f, shader, "camMatrix");
-
-        brickTex.Bind();
-        vao.Bind();
-        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+        camera.updateMatrix(45.0f, 0.01f, 100.0f);
+    
+        model.Draw(shader, camera);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    vao.Delete();
-    vbo.Delete();
-    ebo.Delete();
-    brickTex.Delete();
     shader.Delete();
-
-    delete node;
 
     glfwDestroyWindow(window);
     glfwTerminate();
