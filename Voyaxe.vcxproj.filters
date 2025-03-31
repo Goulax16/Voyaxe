@@ -48,10 +48,13 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MeshRenderer.hpp">
+    <ClCompile Include="ModelRenderer.hpp">
       <Filter>Nodes</Filter>
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
       <Filter>Components</Filter>
     </ClCompile>
   </ItemGroup>
@@ -93,6 +96,9 @@
       <Filter>Components</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
       <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>

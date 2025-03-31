@@ -1,5 +1,4 @@
-#include "Model.h"
-#include "Node3D.hpp"
+#include "ModelRenderer.hpp"
 
 #include <iostream>
 #include <glad/glad.h>
@@ -24,13 +23,6 @@ GLuint indices[] =
 };
 
 int main() {
-	//Window* window = new Window(800, 600, "Hello");
-	//
-	//window->Run();
-
-    auto* node = new Node3D();
-    node->transform.Translate(0.0f, 1.0f, 0.0f);
-
     glfwInit();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -67,7 +59,7 @@ int main() {
 
     Camera camera(800, 600, glm::vec3(0.0f, 0.0f, 2.0f));
 
-    Model model("models/bunny/scene.gltf");
+    auto* node = new ModelRenderer("models/bunny/scene.gltf", shader, camera);
 
     node->Init();
 
@@ -78,13 +70,15 @@ int main() {
         camera.Inputs(window);
         camera.updateMatrix(45.0f, 0.01f, 100.0f);
     
-        model.Draw(shader, camera);
+        node->Update(0.016f);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     shader.Delete();
+
+    delete node;
 
     glfwDestroyWindow(window);
     glfwTerminate();

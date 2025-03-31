@@ -12,9 +12,9 @@ public:
 		this->name = "Node3D";
 	}
 
-	void Init() override {
-		std::cout << "X: " << transform.Position.x 
-			<< "\nY: " << transform.Position.y 
-			<< "\nZ: " << transform.Position.z << std::endl;
+	virtual void Update(float deltaTime) override {}
+
+	virtual void Init() override {
+
 	}
 };
