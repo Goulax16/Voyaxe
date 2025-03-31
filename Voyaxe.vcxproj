@@ -169,7 +169,8 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="EBO.h" />
     <ClInclude Include="Math.h" />
-    <ClInclude Include="Node.hpp" />
+    <ClInclude Include="Node.h" />
+    <ClInclude Include="Node3D.hpp" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Time.hpp" />

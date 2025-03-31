@@ -8,31 +8,52 @@
 
 #include "util.h"
 
-class Node : public std::enable_shared_from_this<Node>
+class Node
 {
-public:
-	using Ptr = std::shared_ptr<Node>;
-
-	Node(const std::string& name = "Node");
-	virtual ~Node();
-
-	virtual void Update(float delta);
-	virtual void Ready() {}
-
-	void AddChild(Ptr child);
-	void RemoveChild(Ptr child);
-	Ptr FindChild(const std::string& name, bool recursive = true) const;
-	std::vector<Ptr> GetChildren() const;
-	Node* GetParent() const;
-
-	void SetName(const std::string& name);
-	std::string GetName() const;
-	std::string GetPath() const;
-
-	virtual glm::mat4 GetGlobalTransform() const { return glm::mat4(1.0f); }
-
 protected:
-	std::string name_;
-	Node* parent_ = nullptr;
-	std::vector<Ptr> children_;
+Node* parent = nullptr;
+std::vector<std::unique_ptr<Node>> children;
+
+vSTR name;
+
+public:
+Node() : name("Node") {}
+virtual ~Node() {}
+
+   void AddChild(std::unique_ptr<Node> node) {
+       node->parent = this;
+       children.push_back(std::move(node));
+   }
+
+void RemoveChild(const vSTR& name) {
+	auto it = std::find_if(children.begin(), children.end(),
+		[&name, this](const std::unique_ptr<Node>& child) {
+			return child.get() == this->GetChild(name);
+		});
+
+	if (it != children.end()) {
+		children.erase(it);
+	}
+}
+
+const Node* GetChild(const vSTR& name) const {
+	auto it = std::find_if(children.begin(), children.end(),
+		[&name](const std::unique_ptr<Node>& child) {
+			return child->name == name;
+		});
+
+	return it != children.end() ? it->get() : nullptr;
+}
+
+virtual void Init() {
+	for (auto& child : children) {
+		child->Init();
+	}
+}
+
+virtual void Update(float deltaTime) {
+	for (auto& child : children) {
+		child->Update(deltaTime);
+	}
+}
 };

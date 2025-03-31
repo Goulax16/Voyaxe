@@ -4,6 +4,7 @@
 #include "Texture.h"
 #include "Math.h"
 #include "Camera.h"
+#include "Node3D.hpp"
 
 #include <iostream>
 #include <glad/glad.h>
@@ -37,6 +38,8 @@ int main() {
 	//Window* window = new Window(800, 600, "Hello");
 	//
 	//window->Run();
+
+    auto* node = new Node3D();
 
     glfwInit();
 
@@ -86,6 +89,8 @@ int main() {
 
     Camera camera(800, 600, glm::vec3(0.0f, 0.0f, 2.0f));
 
+    node->Init();
+
     while (!glfwWindowShouldClose(window)) {
         angle += 0.01f;
 
@@ -112,6 +117,8 @@ int main() {
     ebo.Delete();
     brickTex.Delete();
     shader.Delete();
+
+    delete node;
 
     glfwDestroyWindow(window);
     glfwTerminate();
