@@ -4,7 +4,7 @@
 #include "Texture.h"
 #include "Math.h"
 #include "Camera.h"
-#include "Node3D.hpp"
+#include "MeshRenderer.hpp"
 
 #include <iostream>
 #include <glad/glad.h>
@@ -39,7 +39,8 @@ int main() {
 	//
 	//window->Run();
 
-    auto* node = new Node3D();
+    auto* node = new MeshRenderer();
+    node->transform.Translate(0.0f, 1.0f, 0.0f);
 
     glfwInit();
 
