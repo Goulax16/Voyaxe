@@ -16,15 +16,20 @@ public:
 	Node(const std::string& name = "Node");
 	virtual ~Node();
 
+	virtual void Update(float delta);
+	virtual void Ready() {}
+
 	void AddChild(Ptr child);
 	void RemoveChild(Ptr child);
-	Ptr GetChild(const vSTR& name) const;
+	Ptr FindChild(const std::string& name, bool recursive = true) const;
 	std::vector<Ptr> GetChildren() const;
+	Node* GetParent() const;
 
 	void SetName(const std::string& name);
 	std::string GetName() const;
+	std::string GetPath() const;
 
-	virtual void Update(float delta);
+	virtual glm::mat4 GetGlobalTransform() const { return glm::mat4(1.0f); }
 
 protected:
 	std::string name_;
