@@ -11,7 +11,7 @@ class SceneManager
 {
 private:
 	Window* window;
-	Scene* currentScene;
+	Scene* currentScene = nullptr;
 
 public:
 	SceneManager();

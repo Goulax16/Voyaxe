@@ -33,17 +33,14 @@ public:
 
         shader->Activate();
         for (Camera* cam : cameras) {
-            // Configurar matrices de vista y proyección
             glUniformMatrix4fv(glGetUniformLocation(shader->ID, "view"), 1, GL_FALSE,
                 glm::value_ptr(cam->GetViewMatrix()));
             glUniformMatrix4fv(glGetUniformLocation(shader->ID, "projection"), 1, GL_FALSE,
                 glm::value_ptr(cam->GetProjectionMatrix()));
 
-            // Pasar posición de la cámara
             glUniform3fv(glGetUniformLocation(shader->ID, "camPos"), 1,
                 glm::value_ptr(cam->Position));
 
-            // Renderizar el modelo
             model->Draw(*shader, *cam, transform.GetModelMatrix());
         }
     }
