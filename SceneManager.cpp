@@ -15,9 +15,6 @@ SceneManager::~SceneManager() {
 void SceneManager::SetCurrentScene(Scene* scene) {
     if (currentScene != scene) {
         currentScene = scene;
-        if (currentScene) {
-            currentScene->SetSceneManager(this);
-        }
     }
 }
 

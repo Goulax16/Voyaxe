@@ -14,14 +14,9 @@ private:
 	std::unordered_map<Node*, std::string> nodes;
 	std::string sceneName;
 
-	SceneManager* sceneManager;
-
 public:
 
 	Scene(std::string name) : sceneName(name) {}
-
-	void SetSceneManager(SceneManager* manager) { sceneManager = manager; }
-	SceneManager* GetSceneManager() const { return sceneManager; }
 
 	void Init() {
 		for (auto& pair : nodes) {

@@ -3,7 +3,6 @@
 #include <iostream>
 #include <stdexcept>
 
-// ImGui includes
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_glfw.h"
@@ -88,11 +87,9 @@ bool Window::Initialize() {
 }
 
 void Window::SetupViewport() {
-    // Crear framebuffer
     glGenFramebuffers(1, &m_framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
 
-    // Crear textura para el color buffer
     glGenTextures(1, &m_viewportTexture);
     glBindTexture(GL_TEXTURE_2D, m_viewportTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_viewportSize.x, m_viewportSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
@@ -100,7 +97,6 @@ void Window::SetupViewport() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_viewportTexture, 0);
 
-    // Crear renderbuffer para depth y stencil
     glGenRenderbuffers(1, &m_rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, m_rbo);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_viewportSize.x, m_viewportSize.y);
@@ -114,7 +110,6 @@ void Window::SetupViewport() {
 }
 
 void Window::ResizeViewport() {
-    // Actualizar textura y renderbuffer con el nuevo tama�o
     glBindTexture(GL_TEXTURE_2D, m_viewportTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_viewportSize.x, m_viewportSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
@@ -161,10 +156,8 @@ void Window::Run() {
 }
 
 void Window::Update() {
-    // Process input
     ProcessInput();
 
-    // Clear screen
     glClearColor(0.21f, 0.35f, 0.42f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -227,14 +220,12 @@ void Window::RenderImGui() {
 
     ImGui::Begin("Viewport");
     {
-        // Mostrar la textura del viewport en ImGui
         ImVec2 viewportSize = ImGui::GetContentRegionAvail();
         if (viewportSize.x != m_viewportSize.x || viewportSize.y != m_viewportSize.y) {
             m_viewportSize = { viewportSize.x, viewportSize.y };
             ResizeViewport();
         }
 
-        // Usar la textura del framebuffer como imagen ImGui
         ImGui::Image(
             (ImTextureID)(intptr_t)GetViewportTexture(),
             viewportSize,

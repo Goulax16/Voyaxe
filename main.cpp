@@ -5,7 +5,7 @@
 int main() {
     auto* sceneManager = new SceneManager();
 
-    // Correct the initialization of ModelRenderer
+    //TODO: Add ModelRenderer Node
     sceneManager->SetCurrentScene(new DefaultScene("Main"));
     sceneManager->Init();
 
