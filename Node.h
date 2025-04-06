@@ -14,11 +14,11 @@ protected:
 	Node* parent = nullptr;
 	std::vector<std::unique_ptr<Node>> children;
 
+public:
 	vSTR name;
 
-public:
 	Node() : name("Node") {}
-	virtual ~Node() { delete this; }
+	virtual ~Node() = default;
 
 	void AddChild(std::unique_ptr<Node> node) {
 		node->parent = this;
@@ -34,6 +34,10 @@ public:
 		if (it != children.end()) {
 			children.erase(it);
 		}
+	}
+
+	virtual void Render() {
+
 	}
 
 	const Node* GetChild(const vSTR& name) const {
@@ -55,5 +59,23 @@ public:
 		for (auto& child : children) {
 			child->Update(deltaTime);
 		}
+	}
+
+	virtual void Destroy() {
+		// First destroy all children
+		for (auto& child : children) {
+			child->Destroy();
+		}
+
+		// Clear the children vector
+		children.clear();
+
+		// If this node has a parent, remove it from parent's children
+		if (parent) {
+			parent->RemoveChild(name);
+		}
+
+		// Perform any additional cleanup in derived classes
+		// (this will be called through virtual dispatch)
 	}
 };

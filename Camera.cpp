@@ -33,10 +33,7 @@ void Camera::Matrix(Shader& shader, const char* uniform)
 }
 
 
-
-void Camera::Inputs(GLFWwindow* window)
-{
-	// Handles key inputs
+void Camera::KeyboardInputs(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		Position += speed * Orientation;
@@ -69,7 +66,11 @@ void Camera::Inputs(GLFWwindow* window)
 	{
 		speed = 0.1f;
 	}
+}
 
+void Camera::MouseInputs(GLFWwindow* window)
+{
+	// Handles key inputs
 
 	// Handles mouse inputs
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)

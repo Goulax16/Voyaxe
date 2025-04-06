@@ -30,5 +30,14 @@ public:
 
 	void updateMatrix(float FOVdeg, float nearPlane, float farPlane);
 	void Matrix(Shader& shader, const char* uniform);
-	void Inputs(GLFWwindow* window);
+	void KeyboardInputs(GLFWwindow* window);
+	void MouseInputs(GLFWwindow* window);
+
+	glm::mat4 GetViewMatrix() const {
+		return glm::lookAt(Position, Position + Orientation, Up);
+	}
+
+	glm::mat4 GetProjectionMatrix() const {
+		return glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
+	}
 };

@@ -13,8 +13,7 @@ public:
 	}
 
 	virtual void Update(float deltaTime) override {}
+	virtual void Init() override {}
 
-	virtual void Init() override {
-
-	}
+	virtual void Render() override {}
 };

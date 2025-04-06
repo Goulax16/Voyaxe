@@ -1,6 +1,6 @@
 #include"Model.h"
 
-Model::Model(const char* file)
+Model::Model(vCSTR file)
 {
 	// Make a JSON object
 	std::string text = get_file_contents(file);
@@ -14,15 +14,28 @@ Model::Model(const char* file)
 	traverseNode(0);
 }
 
-void Model::Draw(Shader& shader, Camera& camera)
-{
-	// Go over all meshes and draw each one
-	for (unsigned int i = 0; i < meshes.size(); i++)
-	{
-		meshes[i].Mesh::Draw(shader, camera, matricesMeshes[i]);
+Model::~Model() {
+	for (auto& mesh : meshes) {
+		mesh.Cleanup();
 	}
 }
 
+void Model::Draw(Shader& shader, Camera& camera, const glm::mat4& parentModelMatrix)
+{
+	shader.Activate();
+
+	glUniform3f(glGetUniformLocation(shader.ID, "lightPos"),
+		camera.Position.x, camera.Position.y, camera.Position.z);
+	glUniform3f(glGetUniformLocation(shader.ID, "lightColor"), 1.0f, 1.0f, 1.0f);
+
+	// Go over all meshes and draw each one
+	for (unsigned int i = 0; i < meshes.size(); i++)
+	{
+		// Combine the parent model matrix with the mesh's transformation matrix
+		glm::mat4 combinedMatrix = parentModelMatrix * matricesMeshes[i];
+		meshes[i].Mesh::Draw(shader, camera, combinedMatrix);
+	}
+}
 void Model::loadMesh(unsigned int indMesh)
 {
 	// Get all accessor indices

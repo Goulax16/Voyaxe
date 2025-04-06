@@ -5,12 +5,12 @@
 #include "util.h"
 #include "VBO.h"
 
-class VAO
+class vao
 {
 public:
 	vUINT id;
 
-	VAO();
+	vao();
 
 	void LinkAttrib(VBO& vbo, vUINT layout, vUINT numComponents, GLenum type, vSIZEIPTR stride, void* offset);
 
