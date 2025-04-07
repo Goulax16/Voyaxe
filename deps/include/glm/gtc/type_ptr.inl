@@ -260,124 +260,124 @@ namespace glm
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER vec<2, T, defaultp> make_vec2(T const *const ptr)
+	GLM_FUNC_QUALIFIER vec<2, T, defaultp> make_vec2(T const *const Ptr)
 	{
 		vec<2, T, defaultp> Result;
-		memcpy(value_ptr(Result), ptr, sizeof(vec<2, T, defaultp>));
+		memcpy(value_ptr(Result), Ptr, sizeof(vec<2, T, defaultp>));
 		return Result;
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER vec<3, T, defaultp> make_vec3(T const *const ptr)
+	GLM_FUNC_QUALIFIER vec<3, T, defaultp> make_vec3(T const *const Ptr)
 	{
 		vec<3, T, defaultp> Result;
-		memcpy(value_ptr(Result), ptr, sizeof(vec<3, T, defaultp>));
+		memcpy(value_ptr(Result), Ptr, sizeof(vec<3, T, defaultp>));
 		return Result;
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER vec<4, T, defaultp> make_vec4(T const *const ptr)
+	GLM_FUNC_QUALIFIER vec<4, T, defaultp> make_vec4(T const *const Ptr)
 	{
 		vec<4, T, defaultp> Result;
-		memcpy(value_ptr(Result), ptr, sizeof(vec<4, T, defaultp>));
+		memcpy(value_ptr(Result), Ptr, sizeof(vec<4, T, defaultp>));
 		return Result;
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER mat<2, 2, T, defaultp> make_mat2x2(T const *const ptr)
+	GLM_FUNC_QUALIFIER mat<2, 2, T, defaultp> make_mat2x2(T const *const Ptr)
 	{
 		mat<2, 2, T, defaultp> Result;
-		memcpy(value_ptr(Result), ptr, sizeof(mat<2, 2, T, defaultp>));
+		memcpy(value_ptr(Result), Ptr, sizeof(mat<2, 2, T, defaultp>));
 		return Result;
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER mat<2, 3, T, defaultp> make_mat2x3(T const *const ptr)
+	GLM_FUNC_QUALIFIER mat<2, 3, T, defaultp> make_mat2x3(T const *const Ptr)
 	{
 		mat<2, 3, T, defaultp> Result;
-		memcpy(value_ptr(Result), ptr, sizeof(mat<2, 3, T, defaultp>));
+		memcpy(value_ptr(Result), Ptr, sizeof(mat<2, 3, T, defaultp>));
 		return Result;
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER mat<2, 4, T, defaultp> make_mat2x4(T const *const ptr)
+	GLM_FUNC_QUALIFIER mat<2, 4, T, defaultp> make_mat2x4(T const *const Ptr)
 	{
 		mat<2, 4, T, defaultp> Result;
-		memcpy(value_ptr(Result), ptr, sizeof(mat<2, 4, T, defaultp>));
+		memcpy(value_ptr(Result), Ptr, sizeof(mat<2, 4, T, defaultp>));
 		return Result;
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER mat<3, 2, T, defaultp> make_mat3x2(T const *const ptr)
+	GLM_FUNC_QUALIFIER mat<3, 2, T, defaultp> make_mat3x2(T const *const Ptr)
 	{
 		mat<3, 2, T, defaultp> Result;
-		memcpy(value_ptr(Result), ptr, sizeof(mat<3, 2, T, defaultp>));
+		memcpy(value_ptr(Result), Ptr, sizeof(mat<3, 2, T, defaultp>));
 		return Result;
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER mat<3, 3, T, defaultp> make_mat3x3(T const *const ptr)
+	GLM_FUNC_QUALIFIER mat<3, 3, T, defaultp> make_mat3x3(T const *const Ptr)
 	{
 		mat<3, 3, T, defaultp> Result;
-		memcpy(value_ptr(Result), ptr, sizeof(mat<3, 3, T, defaultp>));
+		memcpy(value_ptr(Result), Ptr, sizeof(mat<3, 3, T, defaultp>));
 		return Result;
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER mat<3, 4, T, defaultp> make_mat3x4(T const *const ptr)
+	GLM_FUNC_QUALIFIER mat<3, 4, T, defaultp> make_mat3x4(T const *const Ptr)
 	{
 		mat<3, 4, T, defaultp> Result;
-		memcpy(value_ptr(Result), ptr, sizeof(mat<3, 4, T, defaultp>));
+		memcpy(value_ptr(Result), Ptr, sizeof(mat<3, 4, T, defaultp>));
 		return Result;
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER mat<4, 2, T, defaultp> make_mat4x2(T const *const ptr)
+	GLM_FUNC_QUALIFIER mat<4, 2, T, defaultp> make_mat4x2(T const *const Ptr)
 	{
 		mat<4, 2, T, defaultp> Result;
-		memcpy(value_ptr(Result), ptr, sizeof(mat<4, 2, T, defaultp>));
+		memcpy(value_ptr(Result), Ptr, sizeof(mat<4, 2, T, defaultp>));
 		return Result;
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER mat<4, 3, T, defaultp> make_mat4x3(T const *const ptr)
+	GLM_FUNC_QUALIFIER mat<4, 3, T, defaultp> make_mat4x3(T const *const Ptr)
 	{
 		mat<4, 3, T, defaultp> Result;
-		memcpy(value_ptr(Result), ptr, sizeof(mat<4, 3, T, defaultp>));
+		memcpy(value_ptr(Result), Ptr, sizeof(mat<4, 3, T, defaultp>));
 		return Result;
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER mat<4, 4, T, defaultp> make_mat4x4(T const *const ptr)
+	GLM_FUNC_QUALIFIER mat<4, 4, T, defaultp> make_mat4x4(T const *const Ptr)
 	{
 		mat<4, 4, T, defaultp> Result;
-		memcpy(value_ptr(Result), ptr, sizeof(mat<4, 4, T, defaultp>));
+		memcpy(value_ptr(Result), Ptr, sizeof(mat<4, 4, T, defaultp>));
 		return Result;
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER mat<2, 2, T, defaultp> make_mat2(T const *const ptr)
+	GLM_FUNC_QUALIFIER mat<2, 2, T, defaultp> make_mat2(T const *const Ptr)
 	{
-		return make_mat2x2(ptr);
+		return make_mat2x2(Ptr);
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER mat<3, 3, T, defaultp> make_mat3(T const *const ptr)
+	GLM_FUNC_QUALIFIER mat<3, 3, T, defaultp> make_mat3(T const *const Ptr)
 	{
-		return make_mat3x3(ptr);
+		return make_mat3x3(Ptr);
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER mat<4, 4, T, defaultp> make_mat4(T const *const ptr)
+	GLM_FUNC_QUALIFIER mat<4, 4, T, defaultp> make_mat4(T const *const Ptr)
 	{
-		return make_mat4x4(ptr);
+		return make_mat4x4(Ptr);
 	}
 
 	template<typename T>
-	GLM_FUNC_QUALIFIER qua<T, defaultp> make_quat(T const *const ptr)
+	GLM_FUNC_QUALIFIER qua<T, defaultp> make_quat(T const *const Ptr)
 	{
 		qua<T, defaultp> Result;
-		memcpy(value_ptr(Result), ptr, sizeof(qua<T, defaultp>));
+		memcpy(value_ptr(Result), Ptr, sizeof(qua<T, defaultp>));
 		return Result;
 	}
 

@@ -9,7 +9,7 @@ class EBO
 public:
 	vUINT id;
 
-	EBO(vUINT* indices, vSIZEIPTR size);
+	EBO(vVEC<vUINT>& indices);
 
 	void Bind();
 	void Unbind();

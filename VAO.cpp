@@ -1,10 +1,10 @@
 #include "VAO.h"
 
-VAO::VAO() {
+vao::vao() {
 	glGenVertexArrays(1, &id);
 }
 
-void VAO::LinkAttrib(VBO& VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset)
+void vao::LinkAttrib(VBO& VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset)
 {
 	VBO.Bind();
 	glVertexAttribPointer(layout, numComponents, type, GL_FALSE, stride, offset);
@@ -12,17 +12,17 @@ void VAO::LinkAttrib(VBO& VBO, GLuint layout, GLuint numComponents, GLenum type,
 	VBO.Unbind();
 }
 
-void VAO::Bind()
+void vao::Bind()
 {
 	glBindVertexArray(id);
 }
 
-void VAO::Unbind()
+void vao::Unbind()
 {
 	glBindVertexArray(0);
 }
 
-void VAO::Delete()
+void vao::Delete()
 {
 	glDeleteVertexArrays(1, &id);
 }
