@@ -10,17 +10,32 @@
 class ModelRenderer : public Node3D, public IRenderable
 {
 private:
-	Model* model;
-	Shader* shader;
+    Model* model;
+    Shader* shader;
     std::vector<Camera*> cameras;
     bool isActive;
 
+    // Propiedades de luz
+    int lightType;  // 0 = point, 1 = directional, 2 = spot
+    glm::vec3 lightPos;
+    glm::vec3 lightDirection;
+    glm::vec4 lightColor;
+    float outerCone;
+    float innerCone;
+
 public:
     ModelRenderer(const char* modelPath, std::vector<Camera*>& cameras)
-        : shader(new Shader("vert.glsl", "frag.glsl")), cameras(cameras), Node3D(), isActive(true) {
+        : shader(new Shader("vert.glsl", "frag.glsl")), cameras(cameras), Node3D(), isActive(true),
+        lightType(1), // Por defecto: luz direccional
+        lightPos(5.0f, 5.0f, 5.0f),
+        lightDirection(-0.2f, -1.0f, -0.3f),
+        lightColor(1.0f, 1.0f, 1.0f, 1.0f),
+        outerCone(0.90f),
+        innerCone(0.95f)
+    {
         model = new Model(modelPath);
-		this->name = "ModelRenderer";
-	}
+        this->name = "ModelRenderer";
+    }
 
     ~ModelRenderer() { Destroy(); }
 
@@ -33,6 +48,21 @@ public:
         if (!isActive || !model) return;
 
         shader->Activate();
+
+        // Configurar propiedades de luz
+        glUniform1i(glGetUniformLocation(shader->ID, "lightType"), lightType);
+        glUniform3fv(glGetUniformLocation(shader->ID, "lightPos"), 1, glm::value_ptr(lightPos));
+        glUniform4fv(glGetUniformLocation(shader->ID, "lightColor"), 1, glm::value_ptr(lightColor));
+
+        if (lightType == 1 || lightType == 2) { // Directional o Spot
+            glUniform3fv(glGetUniformLocation(shader->ID, "lightDirection"), 1, glm::value_ptr(lightDirection));
+        }
+
+        if (lightType == 2) { // Spot light
+            glUniform1f(glGetUniformLocation(shader->ID, "outerCone"), outerCone);
+            glUniform1f(glGetUniformLocation(shader->ID, "innerCone"), innerCone);
+        }
+
         for (Camera* cam : cameras) {
             glUniformMatrix4fv(glGetUniformLocation(shader->ID, "view"), 1, GL_FALSE,
                 glm::value_ptr(cam->GetViewMatrix()));
@@ -45,6 +75,13 @@ public:
             model->Draw(*shader, *cam, transform.GetModelMatrix());
         }
     }
+
+    // Métodos para configurar la luz
+    void SetLightType(int type) { lightType = type; }
+    void SetLightPosition(const glm::vec3& position) { lightPos = position; }
+    void SetLightDirection(const glm::vec3& direction) { lightDirection = direction; }
+    void SetLightColor(const glm::vec4& color) { lightColor = color; }
+    void SetSpotLightCones(float inner, float outer) { innerCone = inner; outerCone = outer; }
 
     void Destroy() override {
         if (!isActive) return;
