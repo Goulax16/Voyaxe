@@ -169,16 +169,18 @@ void Window::Update() {
     EndViewportRender();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, m_width, m_height);
     glClearColor(0.21f, 0.35f, 0.42f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    for (auto& callback : m_renderCallbacks) {
+        callback();
+    }
 
     if (m_imguiInitialized) {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
         RenderImGui();
-
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
