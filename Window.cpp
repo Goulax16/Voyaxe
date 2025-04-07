@@ -92,7 +92,8 @@ void Window::SetupViewport() {
 
     glGenTextures(1, &m_viewportTexture);
     glBindTexture(GL_TEXTURE_2D, m_viewportTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_viewportSize.x, m_viewportSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_viewportSize.x, m_viewportSize.y,
+        0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_viewportTexture, 0);
@@ -111,7 +112,8 @@ void Window::SetupViewport() {
 
 void Window::ResizeViewport() {
     glBindTexture(GL_TEXTURE_2D, m_viewportTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_viewportSize.x, m_viewportSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_viewportSize.x, m_viewportSize.y,
+        0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
     glBindRenderbuffer(GL_RENDERBUFFER, m_rbo);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_viewportSize.x, m_viewportSize.y);
@@ -158,6 +160,15 @@ void Window::Run() {
 void Window::Update() {
     ProcessInput();
 
+    BeginViewportRender();
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    for (auto& callback : m_renderCallbacks) {
+        callback();
+    }
+    EndViewportRender();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClearColor(0.21f, 0.35f, 0.42f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -181,11 +192,20 @@ void Window::InitializeImGui() {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(m_window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
     m_imguiInitialized = true;
+}
+
+void Window::AddRenderCallback(RenderingCallback callback) {
+    m_renderCallbacks.push_back(callback);
+}
+
+void Window::RemoveAllRenderCallbacks() {
+    m_renderCallbacks.clear();
 }
 
 void Window::ProcessInput() {

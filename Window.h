@@ -5,12 +5,19 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <functional>
+#include <vector>
 
 // Forward Decl
 class Camera;
 
 class Window {
 public:
+    using RenderingCallback = std::function<void()>;
+
+    void AddRenderCallback(RenderingCallback callback);
+    void RemoveAllRenderCallbacks();
+
     Window(int width, int height, const std::string& title);
     ~Window();
 
@@ -58,6 +65,8 @@ private:
     void SetupViewport();
     void ResizeViewport();
     void CleanupViewport();
+
+    std::vector<RenderingCallback> m_renderCallbacks;
 
     unsigned int m_framebuffer = 0;
     unsigned int m_viewportTexture = 0;

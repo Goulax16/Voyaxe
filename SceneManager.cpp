@@ -19,26 +19,13 @@ void SceneManager::SetCurrentScene(Scene* scene) {
 }
 
 void SceneManager::Init() {
-    window = new Window(800, 600, "Hello");
+    window = new Window(1280, 720, "Hello");
     window->Initialize();
 }
 
 void SceneManager::Update(float dt) {
     if (currentScene != nullptr && window != nullptr) {
         currentScene->Update(dt);
-
-        BeginViewportRender();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        auto nodes = currentScene->GetNodes();
-        for (auto node : nodes) {
-            if (auto renderable = dynamic_cast<IRenderable*>(node)) {
-                renderable->Render();
-            }
-        }
-
-        EndViewportRender();
-
         window->Update();
     }
 }
@@ -46,5 +33,10 @@ void SceneManager::Update(float dt) {
 void SceneManager::AddNode(Node* node) {
     if (node != nullptr && currentScene != nullptr) {
         currentScene->AddNode(node);
+
+        window->AddRenderCallback([this, node]() {
+            node->Render();
+            std::printf("Im Rendering");
+            });
     }
 }
