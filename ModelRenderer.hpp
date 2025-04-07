@@ -16,15 +16,16 @@ private:
     bool isActive;
 
 public:
-    ModelRenderer(const std::string& modelPath, std::vector<Camera*>& cameras)
-        : shader(new Shader("vert.glsl", "frag.glsl")), model(new Model(modelPath.c_str())), cameras(cameras), Node3D(), isActive(true) {
+    ModelRenderer(const char* modelPath, std::vector<Camera*>& cameras)
+        : shader(new Shader("vert.glsl", "frag.glsl")), cameras(cameras), Node3D(), isActive(true) {
+        model = new Model(modelPath);
 		this->name = "ModelRenderer";
 	}
 
     ~ModelRenderer() { Destroy(); }
 
     void Update(float deltaTime) override {
-        if (!isActive || !model) return;
+        if (!isActive || !model || cameras.empty()) return;
         Node3D::Update(deltaTime);
     }
 

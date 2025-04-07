@@ -4,8 +4,6 @@
 #include "Window.h"
 #include "Scene.hpp"
 
-class Scene; // Forward Decl
-
 class SceneManager
 {
 private:
