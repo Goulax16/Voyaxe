@@ -39,6 +39,7 @@ public:
 
     void AddNode(Node* node) {
         nodes[node] = node->name;
+        node->Init();
     }
 
     void RemoveNode(Node* node) {

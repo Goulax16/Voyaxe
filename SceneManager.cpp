@@ -36,7 +36,6 @@ void SceneManager::AddNode(Node* node) {
 
         window->AddRenderCallback([this, node]() {
             node->Render();
-            std::printf("Im Rendering");
             });
     }
 }

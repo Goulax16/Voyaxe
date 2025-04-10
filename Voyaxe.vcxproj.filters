@@ -100,6 +100,9 @@
     <ClCompile Include="IRenderable.hpp">
       <Filter>Components</Filter>
     </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Node3D.hpp">
@@ -180,6 +183,7 @@
     <ClInclude Include="SceneManager.h">
       <Filter>Scene</Filter>
     </ClInclude>
+    <ClInclude Include="Material.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="vert.glsl">

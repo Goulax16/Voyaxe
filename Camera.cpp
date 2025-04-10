@@ -70,8 +70,6 @@ void Camera::KeyboardInputs(GLFWwindow* window) {
 
 void Camera::MouseInputs(GLFWwindow* window)
 {
-	// Handles key inputs
-
 	// Handles mouse inputs
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{

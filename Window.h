@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <functional>
 #include <vector>
+#include <thread>
 
 // Forward Decl
 class Camera;

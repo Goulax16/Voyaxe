@@ -15,7 +15,7 @@ private:
     std::vector<Camera*> cameras;
     bool isActive;
 
-    // Propiedades de luz
+    // Light Properties
     int lightType;  // 0 = point, 1 = directional, 2 = spot
     glm::vec3 lightPos;
     glm::vec3 lightDirection;
@@ -26,7 +26,7 @@ private:
 public:
     ModelRenderer(const char* modelPath, std::vector<Camera*>& cameras)
         : shader(new Shader("vert.glsl", "frag.glsl")), cameras(cameras), Node3D(), isActive(true),
-        lightType(1), // Por defecto: luz direccional
+        lightType(1), // Default: Directional Light
         lightPos(5.0f, 5.0f, 5.0f),
         lightDirection(-0.2f, -1.0f, -0.3f),
         lightColor(1.0f, 1.0f, 1.0f, 1.0f),
@@ -49,12 +49,12 @@ public:
 
         shader->Activate();
 
-        // Configurar propiedades de luz
+        // Set Light Properties
         glUniform1i(glGetUniformLocation(shader->ID, "lightType"), lightType);
         glUniform3fv(glGetUniformLocation(shader->ID, "lightPos"), 1, glm::value_ptr(lightPos));
         glUniform4fv(glGetUniformLocation(shader->ID, "lightColor"), 1, glm::value_ptr(lightColor));
 
-        if (lightType == 1 || lightType == 2) { // Directional o Spot
+        if (lightType == 1 || lightType == 2) { // Directional or Spot
             glUniform3fv(glGetUniformLocation(shader->ID, "lightDirection"), 1, glm::value_ptr(lightDirection));
         }
 
@@ -75,8 +75,8 @@ public:
             model->Draw(*shader, *cam, transform.GetModelMatrix());
         }
     }
-
-    // Métodos para configurar la luz
+    
+    // MÃ©todos para configurar la luz
     void SetLightType(int type) { lightType = type; }
     void SetLightPosition(const glm::vec3& position) { lightPos = position; }
     void SetLightDirection(const glm::vec3& direction) { lightDirection = direction; }

@@ -5,15 +5,14 @@
 int main() {
     auto* sceneManager = new SceneManager();
 
-
-    sceneManager->SetCurrentScene(new DefaultScene("Main"));
+    sceneManager->SetCurrentScene(new Scene("Main"));
     sceneManager->Init();
 
     std::vector<Camera*> cameras = { sceneManager->GetGlobalCamera() };
-    auto* node = new ModelRenderer("models/bunny/scene.gltf", cameras);
+    auto* modelRenderer = new ModelRenderer("models/bunny/scene.gltf", cameras);
 
-    sceneManager->AddNode(node);
-
+    sceneManager->AddNode(modelRenderer);
+    
     float lastFrame = 0.0f;
     while (!glfwWindowShouldClose(sceneManager->GetWindow())) {
         float currentFrame = (float)glfwGetTime();
