@@ -1,35 +1,40 @@
 #pragma once
 
+#include <memory>
+#include <string>
+#include <vector>
+#include <functional>
+
 #include "Node.h"
 #include "Window.h"
 #include "Scene.hpp"
 
-class SceneManager
-{
+class SceneManager {
 private:
-    Window* window;
-    Scene* currentScene;
+    std::unique_ptr<Window> window;
+    std::shared_ptr<Scene> currentScene;
 
 public:
     SceneManager();
-    ~SceneManager();
+    ~SceneManager() = default;
 
-    Scene* GetCurrentScene() { return currentScene; }
-    void SetCurrentScene(Scene* scene);
+    void SetCurrentScene(std::shared_ptr<Scene> scene);
+    std::shared_ptr<Scene> GetCurrentScene() const { return currentScene; }
 
     void Init();
     void Update(float dt);
 
-    void AddNode(Node* node);
+    void AddNode(std::shared_ptr<Node> node);
 
-    Node* GetNode(std::string name) { return currentScene->GetNode(name); }
-    std::vector<Node*> GetNodes() { return currentScene->GetNodes(); }
+    std::shared_ptr<Node> GetNode(const std::string& name) const;
+    std::vector<std::shared_ptr<Node>> GetNodes() const;
 
-    GLFWwindow* GetWindow() { return window->GetNativeWindow(); }
-    Camera* GetGlobalCamera() { return &window->GetGlobalCamera(); }
+    GLFWwindow* GetWindow() const { return window ? window->GetNativeWindow() : nullptr; }
+    Camera* GetGlobalCamera() const { return window ? &window->GetGlobalCamera() : nullptr; }
+    std::shared_ptr<Camera> GetSharedGlobalCamera() const { return window ? window->GetCamera() : nullptr; }
 
-    void BeginViewportRender() { if (window) window->BeginViewportRender(); }
-    void EndViewportRender() { if (window) window->EndViewportRender(); }
+    void BeginViewportRender() const { if (window) window->BeginViewportRender(); }
+    void EndViewportRender() const { if (window) window->EndViewportRender(); }
     unsigned int GetViewportTexture() const { return window ? window->GetViewportTexture() : 0; }
 
     glm::vec2 GetViewportSize() const { return window ? window->GetViewportSize() : glm::vec2(0.0f); }

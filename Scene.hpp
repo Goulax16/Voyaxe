@@ -4,61 +4,62 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
+#include <memory>
 
 #include "IRenderable.hpp"
 #include "Node.h"
 
-class Scene
-{
+class Scene {
 private:
-    std::unordered_map<Node*, std::string> nodes;
+    std::unordered_map<std::string, std::shared_ptr<Node>> nodes;
     std::string sceneName;
 
 public:
-    Scene(std::string name) : sceneName(name) {}
+    explicit Scene(const std::string& name) : sceneName(name) {}
 
     void Init() {
-        for (auto& pair : nodes) {
-            pair.first->Init();
+        for (const auto& [name, node] : nodes) {
+            node->Init();
         }
     }
 
     void Update(float dt) {
-        for (auto& pair : nodes) {
-            pair.first->Update(dt);
+        for (const auto& [name, node] : nodes) {
+            node->Update(dt);
         }
     }
 
     void Render() {
-        for (auto& pair : nodes) {
-            if (auto renderable = dynamic_cast<IRenderable*>(pair.first)) {
+        for (const auto& [name, node] : nodes) {
+            if (auto renderable = std::dynamic_pointer_cast<IRenderable>(node)) {
                 renderable->Render();
             }
         }
     }
 
-    void AddNode(Node* node) {
-        nodes[node] = node->name;
-        node->Init();
-    }
-
-    void RemoveNode(Node* node) {
-        nodes.erase(node);
-    }
-
-    Node* GetNode(std::string name) {
-        for (auto& pair : nodes) {
-            if (pair.first->name == name) {
-                return pair.first;
-            }
+    void AddNode(std::shared_ptr<Node> node) {
+        if (node) {
+            nodes[node->name] = node;
+            node->Init();
         }
-        throw std::runtime_error("Cannot find gameObject");
     }
 
-    std::vector<Node*> GetNodes() {
-        std::vector<Node*> nodeList;
-        for (const auto& pair : nodes) {
-            nodeList.push_back(pair.first);
+    void RemoveNode(const std::string& name) {
+        nodes.erase(name);
+    }
+
+    std::shared_ptr<Node> GetNode(const std::string& name) const {
+        auto it = nodes.find(name);
+        if (it != nodes.end()) {
+            return it->second;
+        }
+        throw std::runtime_error("Cannot find node with name: " + name);
+    }
+
+    std::vector<std::shared_ptr<Node>> GetNodes() const {
+        std::vector<std::shared_ptr<Node>> nodeList;
+        for (const auto& [name, node] : nodes) {
+            nodeList.push_back(node);
         }
         return nodeList;
     }

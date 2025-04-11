@@ -3,13 +3,17 @@
 #include "ModelRenderer.hpp"  
 
 int main() {
-    auto* sceneManager = new SceneManager();
+    auto sceneManager = std::make_unique<SceneManager>();
 
-    sceneManager->SetCurrentScene(new Scene("Main"));
+    auto mainScene = std::make_shared<DefaultScene>("Main");
+    sceneManager->SetCurrentScene(mainScene);
+
     sceneManager->Init();
 
-    std::vector<Camera*> cameras = { sceneManager->GetGlobalCamera() };
-    auto* modelRenderer = new ModelRenderer("models/bunny/scene.gltf", cameras);
+    auto globalCamera = sceneManager->GetSharedGlobalCamera();
+    std::vector<std::shared_ptr<Camera>> cameras = { globalCamera };
+
+    auto modelRenderer = std::make_shared<ModelRenderer>("models/bunny/scene.gltf", cameras);
 
     sceneManager->AddNode(modelRenderer);
     
@@ -21,8 +25,6 @@ int main() {
 
         sceneManager->Update(deltaTime);
     }
-
-    delete sceneManager;
 
     return 0;
 }

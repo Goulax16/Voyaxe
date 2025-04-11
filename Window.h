@@ -36,7 +36,9 @@ public:
     operator GLFWwindow* () const { return m_window; }
 
     std::shared_ptr<Camera> GetCamera() const { return m_camera; }
+
     Camera& GetGlobalCamera() { return *m_camera; }
+
     glm::ivec2 GetSize() const { return { m_width, m_height }; }
     float GetAspectRatio() const { return static_cast<float>(m_width) / m_height; }
 
@@ -61,6 +63,7 @@ private:
     std::string m_title;
 
     std::shared_ptr<Camera> m_camera;
+
     bool m_imguiInitialized = false;
 
     void SetupViewport();

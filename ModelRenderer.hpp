@@ -10,9 +10,9 @@
 class ModelRenderer : public Node3D, public IRenderable
 {
 private:
-    Model* model;
-    Shader* shader;
-    std::vector<Camera*> cameras;
+    std::unique_ptr<Model> model;
+    std::unique_ptr<Shader> shader;
+    std::vector<std::weak_ptr<Camera>> cameras;
     bool isActive;
 
     // Light Properties
@@ -24,8 +24,11 @@ private:
     float innerCone;
 
 public:
-    ModelRenderer(const char* modelPath, std::vector<Camera*>& cameras)
-        : shader(new Shader("vert.glsl", "frag.glsl")), cameras(cameras), Node3D(), isActive(true),
+    ModelRenderer(const char* modelPath, const std::vector<std::shared_ptr<Camera>>& cameras)
+        : shader(std::make_unique<Shader>("vert.glsl", "frag.glsl")),
+        cameras(),
+        Node3D(),
+        isActive(true),
         lightType(1), // Default: Directional Light
         lightPos(5.0f, 5.0f, 5.0f),
         lightDirection(-0.2f, -1.0f, -0.3f),
@@ -33,11 +36,16 @@ public:
         outerCone(0.90f),
         innerCone(0.95f)
     {
-        model = new Model(modelPath);
+        model = std::make_unique<Model>(modelPath);
         this->name = "ModelRenderer";
+
+        // Store weak pointers to cameras to avoid circular references
+        for (const auto& cam : cameras) {
+            this->cameras.emplace_back(cam);
+        }
     }
 
-    ~ModelRenderer() { Destroy(); }
+    ~ModelRenderer() override = default;
 
     void Update(float deltaTime) override {
         if (!isActive || !model || cameras.empty()) return;
@@ -45,7 +53,7 @@ public:
     }
 
     void Render() override {
-        if (!isActive || !model) return;
+        if (!isActive || !model || cameras.empty()) return;
 
         shader->Activate();
 
@@ -63,16 +71,19 @@ public:
             glUniform1f(glGetUniformLocation(shader->ID, "innerCone"), innerCone);
         }
 
-        for (Camera* cam : cameras) {
-            glUniformMatrix4fv(glGetUniformLocation(shader->ID, "view"), 1, GL_FALSE,
-                glm::value_ptr(cam->GetViewMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(shader->ID, "projection"), 1, GL_FALSE,
-                glm::value_ptr(cam->GetProjectionMatrix()));
+        // Iterate over cameras using weak pointers
+        for (auto& weakCam : cameras) {
+            if (auto cam = weakCam.lock()) { // Check if the camera still exists
+                glUniformMatrix4fv(glGetUniformLocation(shader->ID, "view"), 1, GL_FALSE,
+                    glm::value_ptr(cam->GetViewMatrix()));
+                glUniformMatrix4fv(glGetUniformLocation(shader->ID, "projection"), 1, GL_FALSE,
+                    glm::value_ptr(cam->GetProjectionMatrix()));
 
-            glUniform3fv(glGetUniformLocation(shader->ID, "camPos"), 1,
-                glm::value_ptr(cam->Position));
+                glUniform3fv(glGetUniformLocation(shader->ID, "camPos"), 1,
+                    glm::value_ptr(cam->Position));
 
-            model->Draw(*shader, *cam, transform.GetModelMatrix());
+                model->Draw(*shader, *cam, transform.GetModelMatrix());
+            }
         }
     }
     
@@ -84,20 +95,13 @@ public:
     void SetSpotLightCones(float inner, float outer) { innerCone = inner; outerCone = outer; }
 
     void Destroy() override {
-        if (!isActive) return;
-
         isActive = false;
-
-        if (model) {
-            delete model;
-            model = nullptr;
-        }
-
-        if (shader) {
-            delete shader;
-            shader = nullptr;
-        }
-
         Node::Destroy();
     }
+
+    ModelRenderer(const ModelRenderer&) = delete;
+    ModelRenderer& operator=(const ModelRenderer&) = delete;
+
+    ModelRenderer(ModelRenderer&&) noexcept = default;
+    ModelRenderer& operator=(ModelRenderer&&) noexcept = default;
 };
