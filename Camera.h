@@ -1,43 +1,58 @@
 #pragma once
 
-#include<glad/glad.h>
-#include<GLFW/glfw3.h>
-#include<glm/glm.hpp>
-#include<glm/gtc/matrix_transform.hpp>
-#include<glm/gtc/type_ptr.hpp>
-#include<glm/gtx/rotate_vector.hpp>
-#include<glm/gtx/vector_angle.hpp>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 
-#include"Shader.h"
+#include "Shader.h"
 
 class Camera
 {
+private:
+    glm::vec3 position;
+    glm::vec3 orientation; // Direction vector
+    glm::vec3 up;          // Up vector
+    glm::quat rotation;    // Quaternion for smooth rotations
+
+    glm::mat4 viewMatrix;
+    glm::mat4 projectionMatrix;
+
+    bool firstClick = true;
+
+    int width, height;
+
+    float speed = 0.1f;
+    float sensitivity = 0.1f;
+
+    void updateViewMatrix();
+    void updateProjectionMatrix(float FOVdeg, float nearPlane, float farPlane);
+
 public:
-	glm::vec3 Position;
-	glm::vec3 Orientation = glm::vec3(0.0f, 0.0f, -1.0f);
-	glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::mat4 cameraMatrix = glm::mat4(1.0f);
+    Camera(int width, int height, glm::vec3 position);
 
-	bool firstClick = true;
+    void updateMatrix(float FOVdeg, float nearPlane, float farPlane);
+    void Matrix(Shader& shader, const char* uniform);
 
-	int width;
-	int height;
+    void KeyboardInputs(GLFWwindow* window);
+    void MouseInputs(GLFWwindow* window);
 
-	float speed = 0.1f;
-	float sensitivity = 100.0f;
+    void updateDimensions(int newWidth, int newHeight);
 
-	Camera(int width, int height, glm::vec3 position);
+    glm::mat4 GetViewMatrix() const { return viewMatrix; }
+    glm::mat4 GetProjectionMatrix() const { return projectionMatrix; }
 
-	void updateMatrix(float FOVdeg, float nearPlane, float farPlane);
-	void Matrix(Shader& shader, const char* uniform);
-	void KeyboardInputs(GLFWwindow* window);
-	void MouseInputs(GLFWwindow* window);
+    glm::vec3 GetPosition() const { return position; }
+    void SetPosition(const glm::vec3& newPosition) { position = newPosition; }
 
-	glm::mat4 GetViewMatrix() const {
-		return glm::lookAt(Position, Position + Orientation, Up);
-	}
+    glm::vec3 GetOrientation() const { return orientation; }
+    void SetOrientation(const glm::vec3& newOrientation) { orientation = glm::normalize(newOrientation); }
 
-	glm::mat4 GetProjectionMatrix() const {
-		return glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
-	}
+    float GetSpeed() const { return speed; }
+    void SetSpeed(float newSpeed) { speed = newSpeed; }
+
+    float GetSensitivity() const { return sensitivity; }
+    void SetSensitivity(float newSensitivity) { sensitivity = newSensitivity; }
 };

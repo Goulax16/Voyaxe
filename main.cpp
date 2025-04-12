@@ -23,6 +23,8 @@ int main() {
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        modelRenderer->transform.Rotate(45.0f * deltaTime, 0.0f, 1.0f, 0.0f);
+
         sceneManager->Update(deltaTime);
     }
 

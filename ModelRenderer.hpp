@@ -53,39 +53,47 @@ public:
     }
 
     void Render() override {
-        if (!isActive || !model || cameras.empty()) return;
+    if (!isActive || !model || cameras.empty()) return;
 
-        shader->Activate();
+    shader->Activate();
 
-        // Set Light Properties
-        glUniform1i(glGetUniformLocation(shader->ID, "lightType"), lightType);
-        glUniform3fv(glGetUniformLocation(shader->ID, "lightPos"), 1, glm::value_ptr(lightPos));
-        glUniform4fv(glGetUniformLocation(shader->ID, "lightColor"), 1, glm::value_ptr(lightColor));
+    // Set Light Properties
+    glUniform1i(glGetUniformLocation(shader->ID, "lightType"), lightType);
+    glUniform3fv(glGetUniformLocation(shader->ID, "lightPos"), 1, glm::value_ptr(lightPos));
+    glUniform4fv(glGetUniformLocation(shader->ID, "lightColor"), 1, glm::value_ptr(lightColor));
 
-        if (lightType == 1 || lightType == 2) { // Directional or Spot
-            glUniform3fv(glGetUniformLocation(shader->ID, "lightDirection"), 1, glm::value_ptr(lightDirection));
-        }
+    if (lightType == 1 || lightType == 2) { // Directional or Spot
+        glUniform3fv(glGetUniformLocation(shader->ID, "lightDirection"), 1, glm::value_ptr(lightDirection));
+    }
 
-        if (lightType == 2) { // Spot light
-            glUniform1f(glGetUniformLocation(shader->ID, "outerCone"), outerCone);
-            glUniform1f(glGetUniformLocation(shader->ID, "innerCone"), innerCone);
-        }
+    if (lightType == 2) { // Spot light
+        glUniform1f(glGetUniformLocation(shader->ID, "outerCone"), outerCone);
+        glUniform1f(glGetUniformLocation(shader->ID, "innerCone"), innerCone);
+    }
 
-        // Iterate over cameras using weak pointers
-        for (auto& weakCam : cameras) {
-            if (auto cam = weakCam.lock()) { // Check if the camera still exists
-                glUniformMatrix4fv(glGetUniformLocation(shader->ID, "view"), 1, GL_FALSE,
-                    glm::value_ptr(cam->GetViewMatrix()));
-                glUniformMatrix4fv(glGetUniformLocation(shader->ID, "projection"), 1, GL_FALSE,
-                    glm::value_ptr(cam->GetProjectionMatrix()));
+    // Iterate over cameras using weak pointers
+    for (auto& weakCam : cameras) {
+        if (auto cam = weakCam.lock()) { // Check if the camera still exists
+            glUniformMatrix4fv(glGetUniformLocation(shader->ID, "view"), 1, GL_FALSE,
+                glm::value_ptr(cam->GetViewMatrix()));
+            glUniformMatrix4fv(glGetUniformLocation(shader->ID, "projection"), 1, GL_FALSE,
+                glm::value_ptr(cam->GetProjectionMatrix()));
 
-                glUniform3fv(glGetUniformLocation(shader->ID, "camPos"), 1,
-                    glm::value_ptr(cam->Position));
+            glUniform3fv(glGetUniformLocation(shader->ID, "camPos"), 1,
+                glm::value_ptr(cam->GetPosition()));
 
-                model->Draw(*shader, *cam, transform.GetModelMatrix());
-            }
+            // Get the model matrix from the Transform object
+            glm::mat4 modelMatrix = transform.GetModelMatrix();
+
+            // Pass the model matrix to the shader
+            glUniformMatrix4fv(glGetUniformLocation(shader->ID, "model"), 1, GL_FALSE,
+                glm::value_ptr(modelMatrix));
+
+            // Draw the model
+            model->Draw(*shader, *cam, modelMatrix);
         }
     }
+}
     
     // Métodos para configurar la luz
     void SetLightType(int type) { lightType = type; }

@@ -103,6 +103,12 @@
     <ClCompile Include="Material.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Viewport.cpp">
+      <Filter>Special</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Node3D.hpp">
@@ -184,6 +190,8 @@
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="Material.h" />
+    <ClInclude Include="InputManager.h" />
+    <ClInclude Include="Viewport.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="vert.glsl">
