@@ -8,20 +8,14 @@
 #include "imgui_impl_glfw.h"
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
-    Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
-    if (win) {
-        win->SetViewportSize({ static_cast<float>(width), static_cast<float>(height) });
-    }
+    if (width > 0 && height > 0) glViewport(0, 0, width, height);
 }
 
 Window::Window(int width, int height, const std::string& title)
     : m_width(width), m_height(height), m_title(title) {
 }
 
-Window::~Window() {
-    Cleanup();
-}
+Window::~Window() { Cleanup(); }
 
 Window::Window(Window&& other) noexcept
     : m_window(std::exchange(other.m_window, nullptr)),
@@ -47,7 +41,7 @@ Window& Window::operator=(Window&& other) noexcept {
 
 bool Window::Initialize() {
     if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
+        std::cerr << "Failed to initialize GLFW\n";
         return false;
     }
 
@@ -60,121 +54,39 @@ bool Window::Initialize() {
 
     m_window = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
     if (!m_window) {
-        std::cerr << "Failed to create GLFW window" << std::endl;
+        std::cerr << "Failed to create GLFW window\n";
         glfwTerminate();
         return false;
     }
 
     glfwMakeContextCurrent(m_window);
     glfwSetWindowUserPointer(m_window, this);
-    SetFramebufferSizeCallback(FramebufferSizeCallback);
+    glfwSetFramebufferSizeCallback(m_window, FramebufferSizeCallback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cerr << "Failed to initialize GLAD" << std::endl;
+        std::cerr << "Failed to initialize GLAD\n";
         return false;
     }
 
-    glViewport(0, 0, m_width, m_height);
     glEnable(GL_DEPTH_TEST);
-
-    m_viewportSize = { static_cast<float>(m_width), static_cast<float>(m_height) };
-    SetupViewport();
-
     m_camera = std::make_shared<Camera>(m_width, m_height, glm::vec3(0.0f, 0.0f, 2.0f));
     InitializeImGui();
-
     return true;
 }
 
-void Window::SetupViewport() {
-    glGenFramebuffers(1, &m_framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
-
-    glGenTextures(1, &m_viewportTexture);
-    glBindTexture(GL_TEXTURE_2D, m_viewportTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_viewportSize.x, m_viewportSize.y,
-        0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_viewportTexture, 0);
-
-    glGenRenderbuffers(1, &m_rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_viewportSize.x, m_viewportSize.y);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cerr << "Framebuffer is not complete!" << std::endl;
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void Window::ResizeViewport() {
-    glBindTexture(GL_TEXTURE_2D, m_viewportTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_viewportSize.x, m_viewportSize.y,
-        0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-
-    glBindRenderbuffer(GL_RENDERBUFFER, m_rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_viewportSize.x, m_viewportSize.y);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void Window::BeginViewportRender() {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
-    glViewport(0, 0, m_viewportSize.x, m_viewportSize.y);
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void Window::EndViewportRender() {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void Window::CleanupViewport() {
-    if (m_framebuffer) {
-        glDeleteFramebuffers(1, &m_framebuffer);
-        m_framebuffer = 0;
-    }
-    if (m_viewportTexture) {
-        glDeleteTextures(1, &m_viewportTexture);
-        m_viewportTexture = 0;
-    }
-    if (m_rbo) {
-        glDeleteRenderbuffers(1, &m_rbo);
-        m_rbo = 0;
-    }
-}
-
 void Window::Run() {
-    if (!m_window) {
-        throw std::runtime_error("Window not initialized before calling Run()");
-    }
-
-    while (!glfwWindowShouldClose(m_window)) {
-        Update();
-    }
+    if (!m_window) throw std::runtime_error("Window not initialized");
+    while (!glfwWindowShouldClose(m_window)) Update();
 }
 
 void Window::Update() {
     ProcessInput();
 
-    BeginViewportRender();
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    for (auto& callback : m_renderCallbacks) {
-        callback();
-    }
-    EndViewportRender();
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, m_width, m_height);
-    glClearColor(0.21f, 0.35f, 0.42f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    for (auto& callback : m_renderCallbacks) {
-        callback();
-    }
+    glClearColor(0.10f, 0.23f, 0.32f, 1.0f);
+    for (auto& callback : m_renderCallbacks) callback();
+    CaptureWindowToTexture();
 
     if (m_imguiInitialized) {
         ImGui_ImplOpenGL3_NewFrame();
@@ -189,11 +101,30 @@ void Window::Update() {
     glfwPollEvents();
 }
 
+void Window::CaptureWindowToTexture() {
+    if (!m_captureFramebuffer) {
+        glGenFramebuffers(1, &m_captureFramebuffer);
+        glGenTextures(1, &m_captureTexture);
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_captureFramebuffer);
+    glBindTexture(GL_TEXTURE_2D, m_captureTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_captureTexture, 0);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cerr << "Capture framebuffer is not complete!\n";
+
+    glBlitFramebuffer(0, 0, m_width, m_height, 0, 0, m_width, m_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void Window::InitializeImGui() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     ImGui::StyleColorsDark();
@@ -202,13 +133,9 @@ void Window::InitializeImGui() {
     m_imguiInitialized = true;
 }
 
-void Window::AddRenderCallback(RenderingCallback callback) {
-    m_renderCallbacks.push_back(callback);
-}
+void Window::AddRenderCallback(RenderingCallback callback) { m_renderCallbacks.push_back(callback); }
 
-void Window::RemoveAllRenderCallbacks() {
-    m_renderCallbacks.clear();
-}
+void Window::RemoveAllRenderCallbacks() { m_renderCallbacks.clear(); }
 
 void Window::ProcessInput() {
     if (!m_camera) return;
@@ -216,9 +143,7 @@ void Window::ProcessInput() {
     m_camera->KeyboardInputs(m_window);
 
     ImGuiIO& io = ImGui::GetIO();
-    if (!io.WantCaptureMouse) {
-        m_camera->MouseInputs(m_window);
-    }
+    if (!io.WantCaptureMouse) m_camera->MouseInputs(m_window);
 
     m_camera->updateMatrix(45.0f, 0.01f, 100.0f);
 }
@@ -226,64 +151,35 @@ void Window::ProcessInput() {
 void Window::RenderImGui() {
     if (!m_camera) return;
 
-    ImGui::Begin("Metrics");
-
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-        1000.0f / io.Framerate, io.Framerate);
-
-    const auto& position = m_camera->Position;
-    const auto& orientation = m_camera->Orientation;
-
-    ImGui::Text("Camera Position: (%.2f, %.2f, %.2f)", position.x, position.y, position.z);
-    ImGui::Text("Camera Orientation: (%.2f, %.2f, %.2f)", orientation.x, orientation.y, orientation.z);
-
-    ImGui::End();
-
-    ImGui::Begin("Viewport");
-    {
-        ImVec2 viewportSize = ImGui::GetContentRegionAvail();
-        if (viewportSize.x != m_viewportSize.x || viewportSize.y != m_viewportSize.y) {
-            m_viewportSize = { viewportSize.x, viewportSize.y };
-            ResizeViewport();
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("Exit")) {
+                Cleanup();
+                glfwSetWindowShouldClose(m_window, true);
+            }
+            ImGui::EndMenu();
         }
-
-        ImGui::Image(
-            (ImTextureID)(intptr_t)GetViewportTexture(),
-            viewportSize,
-            ImVec2(0, 1),
-            ImVec2(1, 0)
-        );
+        ImGui::EndMainMenuBar();
     }
+
+    ImGui::Begin("Metrics");
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::Text("FPS: %.1f", io.Framerate);
+    const auto& position = m_camera->GetPosition();
+    const auto& orientation = m_camera->GetOrientation();
+    ImGui::Text("Position: (%.2f, %.2f, %.2f)", position.x, position.y, position.z);
+    ImGui::Text("Orientation: (%.2f, %.2f, %.2f)", orientation.x, orientation.y, orientation.z);
     ImGui::End();
 }
 
 void Window::Cleanup() {
-    CleanupViewport();
-
+    if (m_captureFramebuffer) glDeleteFramebuffers(1, &m_captureFramebuffer);
+    if (m_captureTexture) glDeleteTextures(1, &m_captureTexture);
     if (m_imguiInitialized) {
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
-        m_imguiInitialized = false;
     }
-
-    if (m_window) {
-        glfwDestroyWindow(m_window);
-        m_window = nullptr;
-    }
-    
+    if (m_window) glfwDestroyWindow(m_window);
     glfwTerminate();
-}
-
-void Window::SetFramebufferSizeCallback(GLFWframebuffersizefun callback) {
-    if (m_window) {
-        glfwSetFramebufferSizeCallback(m_window, callback);
-    }
-}
-
-void Window::SetKeyCallback(GLFWkeyfun callback) {
-    if (m_window) {
-        glfwSetKeyCallback(m_window, callback);
-    }
 }

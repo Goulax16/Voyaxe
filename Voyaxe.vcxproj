@@ -183,7 +183,6 @@
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VAO.cpp" />
     <ClCompile Include="VBO.cpp" />
-    <ClCompile Include="Viewport.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -214,7 +213,6 @@
     <ClInclude Include="util.h" />
     <ClInclude Include="VAO.h" />
     <ClInclude Include="VBO.h" />
-    <ClInclude Include="Viewport.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>

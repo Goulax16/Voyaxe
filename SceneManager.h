@@ -32,11 +32,4 @@ public:
     GLFWwindow* GetWindow() const { return window ? window->GetNativeWindow() : nullptr; }
     Camera* GetGlobalCamera() const { return window ? &window->GetGlobalCamera() : nullptr; }
     std::shared_ptr<Camera> GetSharedGlobalCamera() const { return window ? window->GetCamera() : nullptr; }
-
-    void BeginViewportRender() const { if (window) window->BeginViewportRender(); }
-    void EndViewportRender() const { if (window) window->EndViewportRender(); }
-    unsigned int GetViewportTexture() const { return window ? window->GetViewportTexture() : 0; }
-
-    glm::vec2 GetViewportSize() const { return window ? window->GetViewportSize() : glm::vec2(0.0f); }
-    void SetViewportSize(const glm::vec2& size) { if (window) window->SetViewportSize(size); }
 };

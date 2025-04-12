@@ -42,15 +42,6 @@ public:
     glm::ivec2 GetSize() const { return { m_width, m_height }; }
     float GetAspectRatio() const { return static_cast<float>(m_width) / m_height; }
 
-    void SetFramebufferSizeCallback(GLFWframebuffersizefun callback);
-    void SetKeyCallback(GLFWkeyfun callback);
-
-    void BeginViewportRender();
-    void EndViewportRender();
-    unsigned int GetViewportTexture() const { return m_viewportTexture; }
-    glm::vec2 GetViewportSize() const { return m_viewportSize; }
-    void SetViewportSize(const glm::vec2& size) { m_viewportSize = size; ResizeViewport(); }
-
 private:
     void InitializeImGui();
     void RenderImGui();
@@ -62,18 +53,14 @@ private:
     int m_height;
     std::string m_title;
 
+    void CaptureWindowToTexture();
+
     std::shared_ptr<Camera> m_camera;
 
     bool m_imguiInitialized = false;
 
-    void SetupViewport();
-    void ResizeViewport();
-    void CleanupViewport();
-
     std::vector<RenderingCallback> m_renderCallbacks;
 
-    unsigned int m_framebuffer = 0;
-    unsigned int m_viewportTexture = 0;
-    unsigned int m_rbo = 0;
-    glm::vec2 m_viewportSize = { 0.0f, 0.0f };
+    unsigned int m_captureFramebuffer = 0;
+    unsigned int m_captureTexture = 0;
 };
