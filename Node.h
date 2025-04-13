@@ -49,6 +49,14 @@ public:
 		return it != children.end() ? it->get() : nullptr;
 	}
 
+	const std::vector<std::unique_ptr<Node>>& GetChildren() const {
+		return children;
+	}
+
+	bool HasChildren() const {
+		return !children.empty();
+	}
+
 	virtual void Init() {
 		for (auto& child : children) {
 			child->Init();

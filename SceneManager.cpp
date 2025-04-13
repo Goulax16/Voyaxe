@@ -23,13 +23,11 @@ void SceneManager::Update(float dt) {
 }
 
 void SceneManager::AddNode(std::shared_ptr<Node> node) {
-    if (node && currentScene) {
-        currentScene->AddNode(node);
+    if (!node || !currentScene) return;
 
-        window->AddRenderCallback([node]() {
-            node->Render();
-            });
-    }
+    currentScene->AddNode(node);
+    window->AddRenderCallback([node]() { node->Render(); });
+    window->m_nodeList.push_back(node);
 }
 
 std::shared_ptr<Node> SceneManager::GetNode(const std::string& name) const {

@@ -7,6 +7,8 @@
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_glfw.h"
 
+using namespace ImGui;
+
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
     if (width > 0 && height > 0) glViewport(0, 0, width, height);
 }
@@ -170,6 +172,28 @@ void Window::RenderImGui() {
     ImGui::Text("Position: (%.2f, %.2f, %.2f)", position.x, position.y, position.z);
     ImGui::Text("Orientation: (%.2f, %.2f, %.2f)", orientation.x, orientation.y, orientation.z);
     ImGui::End();
+
+    ImGui::Begin("Node List");
+    if (ImGui::TreeNode("Nodes")) {
+        for (auto& weakNode : m_nodeList) {
+            if (auto node = weakNode.lock()) { // Check if the node still exists
+                RenderNodeTree(node.get());
+            }
+        }
+        ImGui::TreePop();
+    }
+    ImGui::End();
+}
+
+void Window::RenderNodeTree(Node* node) {
+    if (ImGui::TreeNode(node->name.c_str())) {
+        if (node->HasChildren()) {
+            for (const auto& child : node->GetChildren()) {
+                RenderNodeTree(child.get());
+            }
+        }
+        ImGui::TreePop();
+    }
 }
 
 void Window::Cleanup() {

@@ -9,7 +9,8 @@
 #include "IRenderable.hpp"
 #include "Node.h"
 
-class Scene {
+class Scene 
+{
 private:
     std::unordered_map<std::string, std::shared_ptr<Node>> nodes;
     std::string sceneName;
@@ -38,14 +39,27 @@ public:
     }
 
     void AddNode(std::shared_ptr<Node> node) {
-        if (node) {
-            nodes[node->name] = node;
-            node->Init();
+        if (!node) {
+            throw std::invalid_argument("Cannot add a null node.");
         }
+
+        std::string nodeName = node->name;
+        int copyIndex = 1;
+
+        // Check if the node already exists and handle duplicates
+        while (NodeExists(nodeName)) {
+            nodeName = node->name + "Cpy" + std::to_string(copyIndex++);
+        }
+
+        nodes[nodeName] = node;
+        node->Init();
     }
 
     void RemoveNode(const std::string& name) {
-        nodes.erase(name);
+        auto it = nodes.find(name);
+        if (it != nodes.end()) {
+            nodes.erase(it);
+        }
     }
 
     std::shared_ptr<Node> GetNode(const std::string& name) const {
@@ -54,6 +68,10 @@ public:
             return it->second;
         }
         throw std::runtime_error("Cannot find node with name: " + name);
+    }
+
+    bool NodeExists(const std::string& name) const {
+        return nodes.find(name) != nodes.end();
     }
 
     std::vector<std::shared_ptr<Node>> GetNodes() const {

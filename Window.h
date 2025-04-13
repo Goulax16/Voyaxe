@@ -9,6 +9,8 @@
 #include <vector>
 #include <thread>
 
+#include "Node.h"
+
 // Forward Decl
 class Camera;
 
@@ -42,11 +44,14 @@ public:
     glm::ivec2 GetSize() const { return { m_width, m_height }; }
     float GetAspectRatio() const { return static_cast<float>(m_width) / m_height; }
 
+    std::vector<std::weak_ptr<Node>> m_nodeList;
 private:
     void InitializeImGui();
     void RenderImGui();
     void Cleanup();
     void ProcessInput();
+
+    void RenderNodeTree(Node* node);
 
     GLFWwindow* m_window = nullptr;
     int m_width;
