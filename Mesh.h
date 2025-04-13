@@ -14,7 +14,7 @@ public:
 	std::vector <GLuint> indices;
 	std::vector <Texture> textures;
 
-	vao vao;
+	VAO vao;
 
 	Mesh(std::vector <Vertex>& vertices, std::vector <GLuint>& indices, std::vector <Texture>& textures);
 	
