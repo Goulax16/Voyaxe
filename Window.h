@@ -45,6 +45,10 @@ public:
     float GetAspectRatio() const { return static_cast<float>(m_width) / m_height; }
 
     std::vector<std::weak_ptr<Node>> m_nodeList;
+
+    bool vSync = true;
+    void EnableVSync(bool state);
+
 private:
     void InitializeImGui();
     void RenderImGui();

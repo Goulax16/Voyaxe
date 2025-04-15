@@ -73,7 +73,15 @@ bool Window::Initialize() {
     glEnable(GL_DEPTH_TEST);
     m_camera = std::make_shared<Camera>(m_width, m_height, glm::vec3(0.0f, 0.0f, 2.0f));
     InitializeImGui();
+
+    glfwSwapInterval(vSync ? 1 : 0);
+
     return true;
+}
+
+void Window::EnableVSync(bool state) {
+    vSync = state;
+    glfwSwapInterval(vSync ? 1 : 0);
 }
 
 void Window::Run() {
@@ -154,7 +162,10 @@ void Window::RenderImGui() {
     if (!m_camera) return;
 
     if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("File")) {
+        if (ImGui::BeginMenu("Actions")) {
+            if (ImGui::MenuItem("VSync", nullptr, vSync)) {
+                EnableVSync(!vSync);
+            }
             if (ImGui::MenuItem("Exit")) {
                 Cleanup();
                 glfwSetWindowShouldClose(m_window, true);

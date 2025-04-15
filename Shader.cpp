@@ -15,38 +15,39 @@ std::string get_file_contents(const char* filename) {
     return contents;
 }
 
-// Reads the contents of a file
-std::string Shader::get_file_contents(const char* filename) {
-    std::ifstream in(filename, std::ios::binary);
-    if (!in) {
-        throw std::runtime_error("Failed to open file: " + std::string(filename));
-    }
+// Constructor
+Shader::Shader(const char* vertexFile, const char* fragmentFile) : ID(0) {
+    try {
+        // Read shader source files
+        std::string vertexCode = get_file_contents(vertexFile);
+        std::string fragmentCode = get_file_contents(fragmentFile);
 
-    std::string contents;
-    in.seekg(0, std::ios::end);
-    contents.resize(in.tellg());
-    in.seekg(0, std::ios::beg);
-    in.read(&contents[0], contents.size());
-    in.close();
-    return contents;
+        // Compile and link shaders
+        compileShaders(vertexCode.c_str(), fragmentCode.c_str());
+
+        // Preallocate space for the uniform cache to reduce rehashing
+        uniformCache.reserve(32); // Adjust based on expected number of uniforms
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Shader initialization failed: " << e.what() << std::endl;
+        throw;
+    }
 }
 
-// Constructor
-Shader::Shader(const char* vertexFile, const char* fragmentFile) {
-    // Read shader source files
-    std::string vertexCode = get_file_contents(vertexFile);
-    std::string fragmentCode = get_file_contents(fragmentFile);
+Shader::~Shader() {
+    if (ID != 0) {
+        glDeleteProgram(ID);
+    }
+}
 
-    const char* vertexSource = vertexCode.c_str();
-    const char* fragmentSource = fragmentCode.c_str();
-
-    // Compile vertex shader
+void Shader::compileShaders(const char* vertexSource, const char* fragmentSource) {
+    // Create and compile vertex shader
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexSource, nullptr);
     glCompileShader(vertexShader);
     compileErrors(vertexShader, "VERTEX");
 
-    // Compile fragment shader
+    // Create and compile fragment shader
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentSource, nullptr);
     glCompileShader(fragmentShader);
@@ -59,7 +60,7 @@ Shader::Shader(const char* vertexFile, const char* fragmentFile) {
     glLinkProgram(ID);
     compileErrors(ID, "PROGRAM");
 
-    // Clean up shaders
+    // Clean up shaders after linking
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 }
@@ -81,15 +82,17 @@ void Shader::compileErrors(unsigned int shader, const char* type) const {
     if (strcmp(type, "PROGRAM") != 0) {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success) {
-            glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
+            glGetShaderInfoLog(shader, sizeof(infoLog), nullptr, infoLog);
             std::cerr << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << std::endl;
+            throw std::runtime_error("Shader compilation failed");
         }
     }
     else {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success) {
-            glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
+            glGetProgramInfoLog(shader, sizeof(infoLog), nullptr, infoLog);
             std::cerr << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << std::endl;
+            throw std::runtime_error("Shader program linking failed");
         }
     }
 }
@@ -120,7 +123,7 @@ void Shader::SetVec3(const std::string& name, const glm::vec3& vec) const {
     glUniform3fv(GetUniformLocation(name), 1, glm::value_ptr(vec));
 }
 
-void Shader::SetVec4(const std::string& name, const glm::vec3& vec) const {
+void Shader::SetVec4(const std::string& name, const glm::vec4& vec) const {
     glUniform4fv(GetUniformLocation(name), 1, glm::value_ptr(vec));
 }
 

@@ -9,6 +9,7 @@ int main() {
     sceneManager->SetCurrentScene(mainScene);
 
     sceneManager->Init();
+    sceneManager->EnableWindowVSync(false);
 
     auto globalCamera = sceneManager->GetSharedGlobalCamera();
     std::vector<std::shared_ptr<Camera>> cameras = { globalCamera };

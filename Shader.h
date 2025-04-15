@@ -15,6 +15,7 @@ std::string get_file_contents(const char* filename);
 class Shader {
 public:
     Shader(const char* vertexFile, const char* fragmentFile);
+    ~Shader();
 
     void Activate() const;
 
@@ -22,14 +23,14 @@ public:
 
     void SetMat4(const std::string& name, const glm::mat4& mat) const;
     void SetVec3(const std::string& name, const glm::vec3& vec) const;
-    void SetVec4(const std::string& name, const glm::vec3& vec) const;
+    void SetVec4(const std::string& name, const glm::vec4& vec) const;
     void SetFloat(const std::string& name, float value) const;
 
     GLuint ID;
 private:
     mutable std::unordered_map<std::string, GLint> uniformCache;
 
-    static std::string get_file_contents(const char* filename);
+    void compileShaders(const char* vertexSource, const char* fragmentSource);
     void compileErrors(unsigned int shader, const char* type) const;
     GLint GetUniformLocation(const std::string& name) const;
 };

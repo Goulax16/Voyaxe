@@ -14,6 +14,8 @@ private:
     std::unique_ptr<Window> window;
     std::shared_ptr<Scene> currentScene;
 
+    bool vSync = false;
+
 public:
     SceneManager();
     ~SceneManager() = default;
@@ -29,7 +31,10 @@ public:
     std::shared_ptr<Node> GetNode(const std::string& name) const;
     std::vector<std::shared_ptr<Node>> GetNodes() const;
 
+    void EnableWindowVSync(bool state) { window->EnableVSync(state); }
+
     GLFWwindow* GetWindow() const { return window ? window->GetNativeWindow() : nullptr; }
+    Window& GetWindowWrapper() const { return *window; }
     Camera* GetGlobalCamera() const { return window ? &window->GetGlobalCamera() : nullptr; }
     std::shared_ptr<Camera> GetSharedGlobalCamera() const { return window ? window->GetCamera() : nullptr; }
 };
