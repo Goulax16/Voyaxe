@@ -13,11 +13,15 @@ out vec2 texCoord;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform vec3 scale; // Nuevo uniform para controlar la escala con un vec3
 
 void main()
 {
+    // Aplicar la escala directamente a las coordenadas del vértice
+    vec3 scaledPos = aPos * scale;
+
     // Transform position to world space
-    crntPos = vec3(model * vec4(aPos, 1.0f));
+    crntPos = vec3(model * vec4(scaledPos, 1.0f));
     
     // Transform normal using normal matrix (transpose of inverse of model matrix)
     mat3 normalMatrix = transpose(inverse(mat3(model)));
@@ -28,5 +32,5 @@ void main()
     texCoord = aTex;
     
     // Final position in clip space
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
+    gl_Position = projection * view * model * vec4(scaledPos, 1.0);
 }

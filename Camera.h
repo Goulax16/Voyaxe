@@ -24,7 +24,7 @@ private:
 
     int width, height;
 
-    float speed = 0.1f;
+    float speed = 10.0f;
     float sensitivity = 0.1f;
 
     void updateViewMatrix();
@@ -36,7 +36,7 @@ public:
     void updateMatrix(float FOVdeg, float nearPlane, float farPlane);
     void Matrix(Shader& shader, const char* uniform);
 
-    void KeyboardInputs(GLFWwindow* window);
+    void KeyboardInputs(GLFWwindow* window, float dt);
     void MouseInputs(GLFWwindow* window);
 
     void updateDimensions(int newWidth, int newHeight);

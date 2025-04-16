@@ -53,7 +53,7 @@ private:
     void InitializeImGui();
     void RenderImGui();
     void Cleanup();
-    void ProcessInput();
+    void ProcessInput(float dt);
 
     void RenderNodeTree(Node* node);
 

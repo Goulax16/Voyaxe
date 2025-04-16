@@ -19,20 +19,20 @@ void Camera::Matrix(Shader& shader, const char* uniform)
     glUniformMatrix4fv(glGetUniformLocation(shader.ID, uniform), 1, GL_FALSE, glm::value_ptr(projectionMatrix * viewMatrix));
 }
 
-void Camera::KeyboardInputs(GLFWwindow* window)
+void Camera::KeyboardInputs(GLFWwindow* window, float dt)
 {
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        position += speed * orientation;
+        position += (speed * orientation) * dt;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        position -= speed * orientation;
+        position -= (speed * orientation) * dt;
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        position -= glm::normalize(glm::cross(orientation, up)) * speed;
+        position -= (glm::normalize(glm::cross(orientation, up)) * speed) * dt;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        position += glm::normalize(glm::cross(orientation, up)) * speed;
+        position += (glm::normalize(glm::cross(orientation, up)) * speed) * dt;
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        position += up * speed;
+        position += (up * speed) * dt;
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        position -= up * speed;
+        position -= (up * speed) * dt;
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         speed = 0.4f;

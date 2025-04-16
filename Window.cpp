@@ -1,5 +1,7 @@
 #include "Window.h"
 #include "Camera.h"
+#include "ModelRenderer.hpp"
+
 #include <iostream>
 #include <stdexcept>
 
@@ -89,26 +91,31 @@ void Window::Run() {
     while (!glfwWindowShouldClose(m_window)) Update();
 }
 
-void Window::Update() {
-    ProcessInput();
+void Window::Update() {  
+   static float lastFrameTime = 0.0f;  
+   float currentFrameTime = static_cast<float>(glfwGetTime());  
+   float deltaTime = currentFrameTime - lastFrameTime;  
+   lastFrameTime = currentFrameTime;  
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.10f, 0.23f, 0.32f, 1.0f);
-    for (auto& callback : m_renderCallbacks) callback();
-    CaptureWindowToTexture();
+   ProcessInput(deltaTime);  
 
-    if (m_imguiInitialized) {
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        RenderImGui();
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    }
+   glBindFramebuffer(GL_FRAMEBUFFER, 0);  
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
+   glClearColor(0.10f, 0.23f, 0.32f, 1.0f);  
+   for (auto& callback : m_renderCallbacks) callback();  
+   CaptureWindowToTexture();  
 
-    glfwSwapBuffers(m_window);
-    glfwPollEvents();
+   if (m_imguiInitialized) {  
+       ImGui_ImplOpenGL3_NewFrame();  
+       ImGui_ImplGlfw_NewFrame();  
+       ImGui::NewFrame();  
+       RenderImGui();  
+       ImGui::Render();  
+       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());  
+   }  
+
+   glfwSwapBuffers(m_window);  
+   glfwPollEvents();  
 }
 
 void Window::CaptureWindowToTexture() {
@@ -147,10 +154,10 @@ void Window::AddRenderCallback(RenderingCallback callback) { m_renderCallbacks.p
 
 void Window::RemoveAllRenderCallbacks() { m_renderCallbacks.clear(); }
 
-void Window::ProcessInput() {
+void Window::ProcessInput(float dt) {
     if (!m_camera) return;
 
-    m_camera->KeyboardInputs(m_window);
+    m_camera->KeyboardInputs(m_window, dt);
 
     ImGuiIO& io = ImGui::GetIO();
     if (!io.WantCaptureMouse) m_camera->MouseInputs(m_window);
@@ -196,15 +203,43 @@ void Window::RenderImGui() {
     ImGui::End();
 }
 
-void Window::RenderNodeTree(Node* node) {
-    if (ImGui::TreeNode(node->name.c_str())) {
-        if (node->HasChildren()) {
-            for (const auto& child : node->GetChildren()) {
-                RenderNodeTree(child.get());
-            }
-        }
-        ImGui::TreePop();
-    }
+void Window::RenderNodeTree(Node* node) {  
+   if (ImGui::TreeNode(node->name.c_str())) {
+       if (node->HasChildren()) {  
+           for (const auto& child : node->GetChildren()) {
+               RenderNodeTree(child.get());
+           }
+       }
+
+       if (auto* modelRenderer = dynamic_cast<ModelRenderer*>(node)) {  
+           glm::vec3 color = modelRenderer->GetMaterial().tintColor;
+           if (ImGui::ColorEdit3("Color", glm::value_ptr(color), 0)) {
+               modelRenderer->ChangeColor(color);
+           }
+           
+           glm::vec3& size = modelRenderer->transform.ScaleValue;
+           if (ImGui::DragFloat3("Size", glm::value_ptr(size))) {
+               modelRenderer->ChangeScale(size);
+           }
+
+           glm::vec3& pos = modelRenderer->transform.Position;
+           if (ImGui::InputFloat3("Pos", glm::value_ptr(pos))) {
+               modelRenderer->ChangePos(pos);
+           }
+
+           int lightType = modelRenderer->GetLightType();
+           if (ImGui::SliderInt("Light Type", &lightType, 0, 2)) {
+               modelRenderer->SetLightType(lightType);
+           }
+
+           glm::vec4 lightColor = modelRenderer->GetLightColor();
+           if (ImGui::ColorEdit4("Light Color", glm::value_ptr(lightColor), 0)) {
+               modelRenderer->SetLightColor(lightColor);
+           }
+       }
+
+       ImGui::TreePop();  
+   }  
 }
 
 void Window::Cleanup() {

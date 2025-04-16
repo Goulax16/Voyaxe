@@ -4,7 +4,23 @@ SceneManager::SceneManager() : window(nullptr), currentScene(nullptr) {}
 
 void SceneManager::SetCurrentScene(std::shared_ptr<Scene> scene) {
     if (scene && scene != currentScene) {
+        if (currentScene) {
+            try {
+                currentScene->clear();
+                window->RemoveAllRenderCallbacks();
+                window->m_nodeList.clear();
+            }
+            catch (const std::exception& e) {
+                // Log the error or handle it appropriately
+                std::cerr << "Error clearing scene: " << e.what() << std::endl;
+            }
+        }
         currentScene = scene;
+        currentScene->Init();
+        for (const auto& node : currentScene->GetNodes()) {
+            window->AddRenderCallback([node]() { node->Render(); });
+            window->m_nodeList.push_back(node);
+        }
     }
 }
 
@@ -18,6 +34,7 @@ void SceneManager::Init() {
 void SceneManager::Update(float dt) {
     if (currentScene && window) {
         currentScene->Update(dt);
+        currentScene->Render();
         window->Update();
     }
 }
@@ -25,9 +42,16 @@ void SceneManager::Update(float dt) {
 void SceneManager::AddNode(std::shared_ptr<Node> node) {
     if (!node || !currentScene) return;
 
-    currentScene->AddNode(node);
-    window->AddRenderCallback([node]() { node->Render(); });
-    window->m_nodeList.push_back(node);
+    try {
+        currentScene->AddNode(node);
+        window->AddRenderCallback([node]() { node->Render(); });
+        window->m_nodeList.push_back(node);
+        std::cout << "Node added successfully: " << node->name << std::endl;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Exception in SceneManager::AddNode: " << e.what() << std::endl;
+        throw;
+    }
 }
 
 std::shared_ptr<Node> SceneManager::GetNode(const std::string& name) const {

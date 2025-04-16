@@ -13,7 +13,7 @@ public:
 
 public:
     void Translate(const glm::vec3& pos) {
-        Position += pos;
+        Position = pos;
     }
 
     void Rotate(float angle, const glm::vec3& axis) {
@@ -21,11 +21,15 @@ public:
     }
 
     void Scale(const glm::vec3& scale) {
-        ScaleValue *= scale;
+        if (scale.x <= 0.0f || scale.y <= 0.0f || scale.z <= 0.0f) {
+            return;
+        }
+
+        ScaleValue = scale;
     }
 
     void Translate(float x, float y, float z) {
-        Position += glm::vec3(x, y, z);
+        Position = glm::vec3(x, y, z);
     }
 
     void Rotate(float angle, float rx, float ry, float rz) {
@@ -33,7 +37,7 @@ public:
     }
 
     void Scale(float x, float y, float z) {
-        ScaleValue *= glm::vec3(x, y, z);
+        Scale(glm::vec3(x, y, z));
     }
 
     glm::mat4 GetModelMatrix() const {

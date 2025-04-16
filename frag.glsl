@@ -16,10 +16,13 @@ uniform vec3 camPos;
 // Nuevos uniforms para controlar el tipo de luz
 uniform int lightType = 1; // 0 = point, 1 = directional, 2 = spot
 
-// Par·metros del spot light
+// Par√°metros del spot light
 uniform float outerCone = 0.90f;
 uniform float innerCone = 0.95f;
 uniform vec3 lightDirection = vec3(0.0f, -1.0f, 0.0f); // Para directional y spot
+
+// Add new uniform for tint color
+uniform vec3 tintColor = vec3(1.0f, 1.0f, 1.0f); // Default to white (no tint)
 
 vec4 calculatePointLight() {
     vec3 lightVec = lightPos - crntPos;
@@ -103,7 +106,7 @@ vec4 calculateSpotLight() {
 }
 
 void main() {
-    // SelecciÛn del tipo de luz
+    // Selecci√≥n del tipo de luz
     switch(lightType) {
         case 0:
             FragColor = calculatePointLight();
@@ -121,4 +124,7 @@ void main() {
     // Gamma correction
     float gamma = 2.2;
     FragColor.rgb = pow(FragColor.rgb, vec3(1.0/gamma));
+    
+    // Apply tint color after gamma correction
+    FragColor.rgb *= tintColor;
 }
