@@ -193,8 +193,8 @@ void Window::RenderImGui() {
 
     ImGui::Begin("Node List");
     if (ImGui::TreeNode("Nodes")) {
-        for (auto& weakNode : m_nodeList) {
-            if (auto node = weakNode.lock()) { // Check if the node still exists
+        for (auto& weakNode : NodeTree::GetInstance().GetAllNodes()) {
+            if (auto node = weakNode) { // Check if the node still exists
                 RenderNodeTree(node.get());
             }
         }
@@ -218,13 +218,23 @@ void Window::RenderNodeTree(Node* node) {
            }
            
            glm::vec3& size = modelRenderer->transform.ScaleValue;
-           if (ImGui::DragFloat3("Size", glm::value_ptr(size))) {
+           if (ImGui::DragFloat3("Scale", glm::value_ptr(size))) {
                modelRenderer->ChangeScale(size);
            }
 
            glm::vec3& pos = modelRenderer->transform.Position;
            if (ImGui::InputFloat3("Pos", glm::value_ptr(pos))) {
                modelRenderer->ChangePos(pos);
+           }
+
+           float* angle = 0;
+           SetNextItemWidth(35.0f);
+           if (ImGui::InputFloat("", angle));
+           ImGui::SameLine();
+
+           glm::vec3 rot = modelRenderer->transform.GetRotationAsVec3();
+           if (ImGui::SliderFloat3("Rot", glm::value_ptr(rot), 0.0f, 359.0f, "%.2f")) {
+               modelRenderer->ChangeRotation(*angle, rot);
            }
 
            int lightType = modelRenderer->GetLightType();

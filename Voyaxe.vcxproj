@@ -177,6 +177,7 @@
     <ClCompile Include="ModelRenderer.hpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="DefaultScene.hpp" />
+    <ClCompile Include="NodeTree.hpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stb.cpp" />

@@ -47,6 +47,10 @@ public:
         return nodeCount;
     }
 
+    void SetNodeCount(int count) const {
+        GetInstance().nodeCount = (size_t)count;
+    }
+
     std::vector<std::shared_ptr<Node>> GetAllNodes() const {
         std::vector<std::shared_ptr<Node>> result;
         result.reserve(nodes.size());

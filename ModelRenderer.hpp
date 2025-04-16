@@ -134,6 +134,14 @@ public:
         transform.Translate(x, y, z);
     }
 
+    void ChangeRotation(float angle, const glm::vec3& rot) {
+        transform.Rotate(angle, rot.x, rot.y, rot.z);
+    }
+
+    void ChangeRotation(float angle, float x, float y, float z) {
+        transform.Rotate(angle, x, y, z);
+    }
+
     int GetLightType() { return lightType; }
     glm::vec4 GetLightColor() { return lightColor; }
 
