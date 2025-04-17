@@ -227,14 +227,14 @@ void Window::RenderNodeTree(Node* node) {
                modelRenderer->ChangePos(pos);
            }
 
-           float* angle = 0;
+           float angle = 0;
            SetNextItemWidth(35.0f);
-           if (ImGui::InputFloat("", angle));
+           if (ImGui::InputFloat("S", &angle));
            ImGui::SameLine();
 
            glm::vec3 rot = modelRenderer->transform.GetRotationAsVec3();
            if (ImGui::SliderFloat3("Rot", glm::value_ptr(rot), 0.0f, 359.0f, "%.2f")) {
-               modelRenderer->ChangeRotation(*angle, rot);
+               modelRenderer->ChangeRotation(angle, rot);
            }
 
            int lightType = modelRenderer->GetLightType();

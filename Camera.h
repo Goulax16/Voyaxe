@@ -24,7 +24,7 @@ private:
 
     int width, height;
 
-    float speed = 10.0f;
+    float speed = 50.0f;
     float sensitivity = 0.1f;
 
     void updateViewMatrix();

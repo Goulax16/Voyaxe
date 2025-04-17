@@ -17,7 +17,7 @@ int main() {
     auto modelRenderer = std::make_shared<ModelRenderer>("models/bunny/scene.gltf", cameras);
     modelRenderer->ChangeColor({0.24f, 0.12f, 0.63f});
 
-    auto modelRenderer2 = std::make_shared<ModelRenderer>("models/bunny/scene.gltf", cameras);
+    auto modelRenderer2 = std::make_shared<ModelRenderer>("models/cube/test_cube.gltf", cameras);
     modelRenderer2->ChangeColor({0.63, 0.24f, 0.12});
     modelRenderer2->name = "Hello";
     modelRenderer2->transform.Translate(1.0f, 0.0f, -2.0f);
