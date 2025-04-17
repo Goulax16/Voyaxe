@@ -109,6 +109,9 @@
     <ClCompile Include="NodeTree.hpp">
       <Filter>Special</Filter>
     </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Node3D.hpp">
@@ -191,6 +194,7 @@
     </ClInclude>
     <ClInclude Include="Material.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="Application.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="vert.glsl">
