@@ -106,7 +106,6 @@ vec4 calculateSpotLight() {
 }
 
 void main() {
-    // Selección del tipo de luz
     switch(lightType) {
         case 0:
             FragColor = calculatePointLight();
