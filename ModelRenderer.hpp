@@ -38,7 +38,7 @@ public:
         innerCone(0.95f)
     {
         model = std::make_unique<Model>(modelPath);
-        auto shader = std::make_shared<Shader>("../shaders/vert.glsl", "../shaders/frag.glsl");
+        auto shader = std::make_shared<Shader>("vert.glsl", "frag.glsl");
         material = std::make_shared<Material>(shader);
         this->name = "ModelRenderer";
 
